@@ -12,5 +12,8 @@
 	   #:ldrop
 	   #:ltake-while
 	   #:ldrop-while
-	   #:lrange))
+	   #:lrange
+	   #:literate
+	   #:-->))
+
 

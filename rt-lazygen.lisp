@@ -88,3 +88,14 @@
 	  (setf start (+ start step))
 	  answer)
 	'end-token)))
+
+(defun literate (fn init)
+  "defines a generator: INIT, (FN INIT), (FN (FN INIT)), etc.."
+  (lambda ()
+    (let ((answer init))
+      (setf init (funcall fn init))
+      answer)))
+
+(defmacro --> (&body clauses)
+  "define a pipeline for data in a lazy generated sequence"
+  (reduce #'(lambda (c1 c2) (append c2 (list c1))) clauses))
