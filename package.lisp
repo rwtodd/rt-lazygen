@@ -1,19 +1,17 @@
 ;;;; package.lisp
 
-(defpackage #:rt-lazygen
-  (:use #:cl)
-  (:export #:lempty-gen
-	   #:llist
-	   #:lmap
-	   #:lfilter
-	   #:for-each
-	   #:to-list
-	   #:ltake
-	   #:ldrop
-	   #:ltake-while
-	   #:ldrop-while
-	   #:lrange
-	   #:literate
-	   #:-->))
-
-
+(defpackage "RT-LAZYGEN"
+  (:use "COMMON-LISP")
+  (:export "LG-EMPTY-GEN"
+	   "LG-LIST"
+	   "LG-MAP"
+	   "LG-FILTER"
+	   "LG-FOR-EACH"
+	   "LG-TO-LIST"
+	   "LG-TAKE"
+	   "LG-DROP"
+	   "LG-TAKE-WHILE"
+	   "LG-DROP-WHILE"
+	   "LG-RANGE"
+	   "LG-ITERATE"
+	   "LG-->"))

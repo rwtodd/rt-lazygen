@@ -2,20 +2,20 @@
 
 ;; TODO: let lmap lfilter etc operate on multiple GENs at once, like mapcar etc do.
 
-(in-package #:rt-lazygen)
+(in-package "RT-LAZYGEN")
 
-(defun lempty-gen ()
+(defun lg-empty-gen ()
   "endlessly return the end-token"
   'end-token)
 
-(defun llist (list)
+(defun lg-list (list)
   "turn LIST into a generator"
   (lambda ()
     (if list
 	(pop list)
 	'end-token)))
 
-(defun lmap (fn gen)
+(defun lg-map (fn gen)
   "create a lazy map applying FN to GEN"
   (lambda ()
     (let ((next (funcall gen)))
@@ -23,26 +23,26 @@
 	  next
 	  (funcall fn next)))))
 
-(defun lfilter (fn gen)
+(defun lg-filter (fn gen)
   "create a lazy filter testing GEN with FN"
   (lambda ()
     (do ((next (funcall gen) (funcall gen)))
 	((or (eq next 'end-token)
 	     (funcall fn next)) next))))
   
-(defun for-each (fn gen)
+(defun lg-for-each (fn gen)
   "apply FN to all elements of GEN for side-effects"
   (do ((elt (funcall gen) (funcall gen)))
       ((eq elt 'end-token) nil)
     (funcall fn elt)))
 
-(defun to-list (gen)
+(defun lg-to-list (gen)
   "convert GEN into a list by evaluating all the elements"
   (do ((answer nil (cons elt answer))
        (elt (funcall gen) (funcall gen)))
       ((eq elt 'end-token) (nreverse answer))))
 
-(defun ltake (n gen)
+(defun lg-take (n gen)
   "lazily take only the first N elements of GEN"
   (lambda ()
     (if (= n 0)
@@ -51,7 +51,7 @@
 	  (decf n)
 	  (funcall gen)))))
 
-(defun ldrop (n gen)
+(defun lg-drop (n gen)
   "lazily drop the first N elements of GEN"
   (lambda ()
     (when n
@@ -59,7 +59,7 @@
       (setf n 0))
     (funcall gen)))
 
-(defun ltake-while (fn gen)
+(defun lg-take-while (fn gen)
   "lazily supply elements of GEN while FN returns true on the elements"
   (lambda ()
     (let ((next (funcall gen)))
@@ -67,10 +67,10 @@
 	      (funcall fn next))
 	  next
 	  (progn
-	    (setf gen #'lempty-gen)
+	    (setf gen #'lg-empty-gen)
 	    'end-token)))))
 
-(defun ldrop-while (fn gen)
+(defun lg-drop-while (fn gen)
   "lazily drop elements of GEN while FN returns true on the elements"
   (lambda ()
     (if fn
@@ -79,7 +79,7 @@
 		 (not (funcall fn next))) (progn (setf fn nil) next)))
 	(funcall gen))))
 
-(defun lrange (&optional (start 0) (end nil) (step 1))
+(defun lg-range (&optional (start 0) (end nil) (step 1))
   "lazily generate a range of numbers from START to END by STEP"
   (lambda ()
     (if (or (null end)
@@ -89,13 +89,13 @@
 	  answer)
 	'end-token)))
 
-(defun literate (fn init)
+(defun lg-iterate (fn init)
   "defines a generator: INIT, (FN INIT), (FN (FN INIT)), etc.."
   (lambda ()
     (let ((answer init))
       (setf init (funcall fn init))
       answer)))
 
-(defmacro --> (&body clauses)
+(defmacro lg--> (&body clauses)
   "define a pipeline for data in a lazy generated sequence"
   (reduce #'(lambda (c1 c2) (append c2 (list c1))) clauses))
