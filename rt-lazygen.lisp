@@ -96,6 +96,26 @@
       (setf init (funcall fn init))
       answer)))
 
+(defun lg-fold (fn init gen)
+  "eagerly fold over a lazy generator with (fn (fn init elt1) elt2)..."
+  (do ((elt (funcall gen) (funcall gen)))
+      ((eq elt 'end-token) init)
+    (setq init (funcall fn init elt))))
+
+(defun lg-every (fn gen)
+  "eagerly determine if FN returns true for every element of GEN"
+  (do ((elt (funcall gen) (funcall gen)))
+      ((or (eq elt 'end-token) (not (funcall fn elt)))
+       (eq elt 'end-token))))
+
+(defun lg-some (fn gen)
+  "eagerly determine if FN returns true for an element of GEN"
+  (do ((elt (funcall gen) (funcall gen)))
+      ((or (eq elt 'end-token) (funcall fn elt))
+       (if (eq elt 'end-token)
+	   (values nil nil)
+	   (values t elt)))))
+
 (defmacro lg--> (&body clauses)
   "define a pipeline for data in a lazy generated sequence"
   (reduce #'(lambda (c1 c2) (append c2 (list c1))) clauses))

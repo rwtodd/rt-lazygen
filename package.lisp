@@ -14,4 +14,7 @@
 	   "LG-DROP-WHILE"
 	   "LG-RANGE"
 	   "LG-ITERATE"
+	   "LG-FOLD"
+	   "LG-EVERY"
+	   "LG-SOME"
 	   "LG-->"))
