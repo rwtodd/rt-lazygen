@@ -9,6 +9,8 @@
 	   "LG-FOR-EACH"
 	   "LG-TO-LIST"
 	   "LG-TAKE"
+	   "LG-FIRST"
+	   "LG-LAST"
 	   "LG-DROP"
 	   "LG-TAKE-WHILE"
 	   "LG-DROP-WHILE"
@@ -17,4 +19,6 @@
 	   "LG-FOLD"
 	   "LG-EVERY"
 	   "LG-SOME"
+	   "LG-GROUPS"
+	   "LG-APPEND"
 	   "LG-->"))

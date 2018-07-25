@@ -51,6 +51,20 @@
 	  (decf n)
 	  (funcall gen)))))
 
+(defun lg-first (gen)
+  "eagerly return the first element of GEN, or NIL"
+  (let ((val (funcall gen)))
+    (if (eq val 'end-token)
+	nil
+	val)))
+
+(defun lg-last (gen)
+  "eagerly return the last element of GEN, or NIL. 
+   Don't call on infinite generators!"
+  (do ((elt nil next)
+       (next (funcall gen) (funcall gen)))
+      ((eq next 'end-token) elt)))
+
 (defun lg-drop (n gen)
   "lazily drop the first N elements of GEN"
   (lambda ()
@@ -115,6 +129,36 @@
        (if (eq elt 'end-token)
 	   (values nil nil)
 	   (values t elt)))))
+
+(defun lg-groups (size keep gen)
+  "lazily group GEN in groups of SIZE, keeping KEEP amount of
+   overlap in successize groups"
+  (if (zerop keep)
+      ;; no overlap in each result...
+      (lambda ()
+	(lg-to-list (lg-take size gen)))
+      ;; overlapping windows....
+      (let ((overlap nil)
+	    (remainder (- size keep)))
+	(lambda ()
+	  (when (null overlap)
+	    (setq overlap (lg-to-list (lg-take keep gen))))
+	  (let ((result (append overlap
+				(lg-to-list (lg-take remainder gen)))))
+	    (setq overlap (nthcdr remainder result))
+	    result)))))
+
+(defun lg-append (&rest gens)
+  "provide elements from generators GENS, in the order given"
+  (labels ((get-next ()
+	     (if (null gens) 'end-token
+		 (let ((elt (funcall (car gens))))
+		   (if (eq elt 'end-token)
+		       (progn
+			 (setq gens (cdr gens))
+			 (get-next))
+		       elt)))))
+    #'get-next))
 
 (defmacro lg--> (&body clauses)
   "define a pipeline for data in a lazy generated sequence"
